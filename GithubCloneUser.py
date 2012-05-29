@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
     Given github user name, clone all public repositories
 """
@@ -9,7 +11,7 @@ import subprocess
 import sys
 import getopt
 
-GIT_CMD = "c:\\Program Files (x86)\\Git\\bin\\git.exe"
+GIT_CMD = "git"
 CLONE_CMD = "clone"
 
 

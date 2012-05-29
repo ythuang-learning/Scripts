@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
     Given github user url, list all public repositories
 """

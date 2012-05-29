@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
     Given github user name, list all public repositories
 """
@@ -10,7 +12,7 @@ import json
 import urllib2
 
 GITHUB_API_V3="https://api.github.com"
-GITHUB_USER_FMT=[GITHUB_API_V3 + "/users/%s/repos",GITHUB_API_V3 + "/users/%s/repos?type=all"]
+GITHUB_USER_FMT=[GITHUB_API_V3 + "/users/%s/repos?per_page=100",GITHUB_API_V3 + "/users/%s/repos?type=all&per_page=100"]
 
 def list_repos(username):
     """
