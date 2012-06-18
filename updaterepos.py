@@ -24,7 +24,7 @@ def get_command():
     directories = list_directories(os.getcwd())
     cmd = ["git", "pull"]
     if "svn" in directories:
-        cmd = ["git svn", "rebase"]
+        cmd = ["git","svn", "rebase"]
     os.chdir("..")
     return cmd
 
