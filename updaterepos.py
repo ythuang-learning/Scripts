@@ -21,7 +21,7 @@ def get_command():
     returns either command for git or git-svn
     """
     os.chdir(".git")
-    directories = list_directories(os.getcwd)
+    directories = list_directories(os.getcwd())
     cmd = ["git", "pull"]
     if "svn" in directories:
         cmd = ["git svn", "rebase"]
