@@ -20,7 +20,13 @@ def get_command():
     get command based on folder type
     returns either command for git or git-svn
     """
-    return ["git", "pull"]
+    os.chdir(".git")
+    directories = list_directories(os.getcwd)
+    cmd = ["git", "pull"]
+    if "svn" in directories:
+        cmd = ["git svn", "rebase"]
+    os.chdir("..")
+    return cmd
 
 
 def find_git_repos(path):
