@@ -39,7 +39,10 @@ def find_git_repos(path):
     directories = list_directories(path)
     if ".git" in directories:
         cmd = get_command()
-        subprocess.call(cmd)
+        #subprocess.call(cmd)
+        p = subprocess.Popen(' '.join(cmd), shell=True, stdin=subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, close_fds= True)
+        output = p.stdout.read()
+        print output
     else:
         for d in directories:
             p = os.path.join(path, d)
