@@ -35,14 +35,15 @@ def find_git_repos(path):
     update the git or git-svn repository if found
     """
     os.chdir(path)
-    print "Looking at: " + path
+    print "Looking at: " + path 
     directories = list_directories(path)
     if ".git" in directories:
         cmd = get_command()
-        #subprocess.call(cmd)
         p = subprocess.Popen(' '.join(cmd), shell=True, stdin=subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, close_fds= True)
         output = p.stdout.read()
-        print output
+
+	if output != "Already up-to-date.\n":
+            print output
     else:
         for d in directories:
             p = os.path.join(path, d)
