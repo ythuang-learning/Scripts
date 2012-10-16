@@ -61,5 +61,5 @@ def find_git_repos(path):
 if __name__ == "__main__":
     cwd = os.getcwd()
     find_git_repos(cwd)
-    pool.joinall()
+    pool.join()
 
