@@ -4,11 +4,12 @@ update all git repositories from current folder
 supports git and git-svn repositories
 """
 import os
-import subprocess
+#import subprocess
 import gevent
 from gevent.pool import Pool
+from gevent.subprocess import Popen, PIPE, STDOUT
 
-pool = Pool(20)
+pool = Pool(10)
 
 def list_directories(path):
     """
@@ -34,10 +35,13 @@ def get_command():
 
 def update_repo(path, cmd):
     print "updating: ", path
-    p = subprocess.Popen(' '.join(cmd), cwd=path, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+    p = Popen(' '.join(cmd), cwd=path, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     output = p.stdout.read()
-    if output != "Already up-to-date.\n":
-        print output
+#    if output != "Already up-to-date.\n":
+#        for line in output:
+#            print path, ": ", line
+    print type(output)
+    print output
 
 
 def find_git_repos(path):
