@@ -5,6 +5,10 @@ supports git and git-svn repositories
 """
 import os
 import subprocess
+import gevent
+from gevent.pool import Pool
+
+pool = Pool(20)
 
 def list_directories(path):
     """
@@ -28,6 +32,13 @@ def get_command():
     os.chdir("..")
     return cmd
 
+def update_repo(path, cmd):
+    print "updating: ", path
+    p = subprocess.Popen(' '.join(cmd), cwd=path, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+    output = p.stdout.read()
+    if output != "Already up-to-date.\n":
+        print output
+
 
 def find_git_repos(path):
     """
@@ -39,11 +50,8 @@ def find_git_repos(path):
     directories = list_directories(path)
     if ".git" in directories:
         cmd = get_command()
-        p = subprocess.Popen(' '.join(cmd), shell=True, stdin=subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, close_fds= True)
-        output = p.stdout.read()
+        pool.spawn(update_repo,path, cmd)
 
-	if output != "Already up-to-date.\n":
-            print output
     else:
         for d in directories:
             p = os.path.join(path, d)
@@ -53,3 +61,5 @@ def find_git_repos(path):
 if __name__ == "__main__":
     cwd = os.getcwd()
     find_git_repos(cwd)
+    pool.joinall()
+
