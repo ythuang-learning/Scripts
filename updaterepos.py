@@ -11,6 +11,7 @@ from gevent.subprocess import Popen, PIPE, STDOUT
 
 worker_number = 40
 pool = Pool(worker_number)
+repo_count = 0
 
 def list_directories(path):
     """
@@ -34,25 +35,26 @@ def get_command():
     os.chdir("..")
     return cmd
 
-def update_repo(path, cmd):
-    print "updating:", path
+def update_repo(path, cmd, count):
+    print count, "]", "updating:", path
     p = Popen(' '.join(cmd), cwd=path, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     for line in p.stdout:
         if line != "Already up-to-date.\n":
-            print path, ":", line,
-
+            print count, "]", path, ":", line,
 
 def find_git_repos(path):
     """
     check whether the current folder is a git or git-svn repository
     update the git or git-svn repository if found
     """
+    global repo_count
     os.chdir(path)
     #print "Looking at: " + path 
     directories = list_directories(path)
     if ".git" in directories:
         cmd = get_command()
-        pool.spawn(update_repo,path, cmd)
+        repo_count += 1
+        pool.spawn(update_repo,path, cmd, repo_count)
 
     else:
         for d in directories:
@@ -64,4 +66,5 @@ if __name__ == "__main__":
     cwd = os.getcwd()
     find_git_repos(cwd)
     pool.join()
+    print "Processed ", repo_count, " repositories"
 
