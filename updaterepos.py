@@ -9,7 +9,8 @@ import gevent
 from gevent.pool import Pool
 from gevent.subprocess import Popen, PIPE, STDOUT
 
-pool = Pool(10)
+worker_number = 40
+pool = Pool(worker_number)
 
 def list_directories(path):
     """
