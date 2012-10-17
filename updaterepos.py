@@ -34,14 +34,11 @@ def get_command():
     return cmd
 
 def update_repo(path, cmd):
-    print "updating: ", path
+    print "updating:", path
     p = Popen(' '.join(cmd), cwd=path, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-    output = p.stdout.read()
-#    if output != "Already up-to-date.\n":
-#        for line in output:
-#            print path, ": ", line
-    print type(output)
-    print output
+    for line in p.stdout:
+        if line != "Already up-to-date.\n":
+            print path, ":", line,
 
 
 def find_git_repos(path):
@@ -50,7 +47,7 @@ def find_git_repos(path):
     update the git or git-svn repository if found
     """
     os.chdir(path)
-    print "Looking at: " + path 
+    #print "Looking at: " + path 
     directories = list_directories(path)
     if ".git" in directories:
         cmd = get_command()
