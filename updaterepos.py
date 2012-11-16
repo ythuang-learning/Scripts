@@ -1,17 +1,18 @@
 #!/usr/bin/env python
+
 """
 update all git repositories from current folder
 supports git and git-svn repositories
 """
 import os
 #import subprocess
-import gevent
 from gevent.pool import Pool
 from gevent.subprocess import Popen, PIPE, STDOUT
 
 worker_number = 40
 pool = Pool(worker_number)
 repo_count = 0
+
 
 def list_directories(path):
     """
@@ -31,9 +32,10 @@ def get_command():
     directories = list_directories(os.getcwd())
     cmd = ["git", "pull"]
     if "svn" in directories:
-        cmd = ["git","svn", "rebase"]
+        cmd = ["git", "svn", "rebase"]
     os.chdir("..")
     return cmd
+
 
 def update_repo(path, cmd, count):
     print count, "]", "updating:", path
@@ -42,6 +44,7 @@ def update_repo(path, cmd, count):
         if line != "Already up-to-date.\n":
             print count, "]", path, ":", line,
 
+
 def find_git_repos(path):
     """
     check whether the current folder is a git or git-svn repository
@@ -49,12 +52,12 @@ def find_git_repos(path):
     """
     global repo_count
     os.chdir(path)
-    #print "Looking at: " + path 
+    #print "Looking at: " + path
     directories = list_directories(path)
     if ".git" in directories:
         cmd = get_command()
         repo_count += 1
-        pool.spawn(update_repo,path, cmd, repo_count)
+        pool.spawn(update_repo, path, cmd, repo_count)
 
     else:
         for d in directories:
@@ -67,4 +70,3 @@ if __name__ == "__main__":
     find_git_repos(cwd)
     pool.join()
     print "Processed ", repo_count, " repositories"
-

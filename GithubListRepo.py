@@ -11,8 +11,9 @@ import sys
 import json
 import urllib2
 
-GITHUB_API_V3="https://api.github.com"
-GITHUB_USER_FMT=[GITHUB_API_V3 + "/users/%s/repos?per_page=100",GITHUB_API_V3 + "/users/%s/repos?type=all&per_page=100"]
+GITHUB_API_V3 = "https://api.github.com"
+GITHUB_USER_FMT = [GITHUB_API_V3 + "/users/%s/repos?per_page=100", GITHUB_API_V3 + "/users/%s/repos?type=all&per_page=100"]
+
 
 def list_repos(username):
     """
@@ -20,13 +21,13 @@ def list_repos(username):
     @param username
     @return set of urls
     """
-    urllist=list()
+    urllist = list()
     for FMT in GITHUB_USER_FMT:
         url = FMT % username
         try:
 
             usock = urllib2.urlopen(url)
-        except (IOError,OSError):
+        except (IOError, OSError):
             print "Something went wrong when trying to find %s repos" % str(username)
             sys.exit()
 
@@ -37,23 +38,26 @@ def list_repos(username):
     urlset = set(urllist)
     return urlset
 
+
 def main(argv):
     """
     main function loop for GithubListProjects
     """
     try:
-        if not len(argv): raise getopt.GetoptError("No options given")
-        opts, args = getopt.getopt(argv, "hu:", ["help","user="])
+        if not len(argv):
+            raise getopt.GetoptError("No options given")
+        opts, args = getopt.getopt(argv, "hu:", ["help", "user="])
     except getopt.GetoptError:
         usage()
         sys.exit()
 
-    if not len(opts): usage()
+    if not len(opts):
+        usage()
     for opt, arg in opts:
-        if opt in ("-h","--help"):
+        if opt in ("-h", "--help"):
             usage()
             sys.exit()
-        elif opt in ("-u","--user"):
+        elif opt in ("-u", "--user"):
             urls = list_repos(arg)
             print "\n".join(u for u in sorted(urls))
 

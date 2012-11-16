@@ -18,10 +18,10 @@ def extract_urls(doc):
     Extract list of url given html document
     """
     soup = BeautifulSoup(doc)
-    li=soup.findAll('li',"public source")
-    li.extend(soup.findAll('li',"simple public source"))
-    li.extend(soup.findAll('li',"public fork"))
-    li.extend(soup.findAll('li',"simple public fork"))
+    li = soup.findAll('li', "public source")
+    li.extend(soup.findAll('li', "simple public source"))
+    li.extend(soup.findAll('li', "public fork"))
+    li.extend(soup.findAll('li', "simple public fork"))
 
     pathlist = list()
 
@@ -33,6 +33,7 @@ def extract_urls(doc):
 
     return ["https://github.com/%s.git" % path for path in pathlist]
 
+
 def list_repos(username):
     """
     list repositories given a github user url
@@ -40,7 +41,7 @@ def list_repos(username):
     GITHUB_USER_FMT = "https://github.com/%s"
     try:
         usock = urllib2.urlopen(GITHUB_USER_FMT % username)
-    except (IOError,OSError):
+    except (IOError, OSError):
         print "Something went wrong when opening %s" % str(username)
         sys.exit()
 
@@ -49,26 +50,28 @@ def list_repos(username):
     gitrepos = extract_urls(doc)
     print "\n".join(gitrepo for gitrepo in gitrepos)
 
+
 def main(argv):
     """
     main function loop for GithubListProjects
     """
     try:
-        if not len(argv): raise getopt.GetoptError("No options given")
-        opts, args = getopt.getopt(argv, "hu:", ["help","url="])
+        if not len(argv):
+            raise getopt.GetoptError("No options given")
+        opts, args = getopt.getopt(argv, "hu:", ["help", "url="])
     except getopt.GetoptError:
         usage()
         sys.exit()
-    if not len(opts): usage()
+    if not len(opts):
+        usage()
     for opt, arg in opts:
-        if opt in ("-h","--help"):
+        if opt in ("-h", "--help"):
             usage()
-        elif opt in ("-u","--user"):
+        elif opt in ("-u", "--user"):
             list_repos(arg)
         else:
             usage()
             sys.exit()
-
 
 
 def usage():
