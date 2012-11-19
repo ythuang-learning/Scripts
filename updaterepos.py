@@ -9,9 +9,9 @@ import os
 from gevent.pool import Pool
 from gevent.subprocess import Popen, PIPE, STDOUT
 
-worker_number = 40
+worker_number = 20
 pool = Pool(worker_number)
-git_sign = ".git"
+git_signature = ".git"
 
 
 def list_directories(path):
@@ -29,11 +29,11 @@ def get_command(bare, path):
     returns either command for bare git, standard git or git-svn
     """
 
-    if(bare):
+    if bare:
         cmd = ["git", "fetch"]
         return cmd
 
-    directories = list_directories(os.path.join(path, git_sign))
+    directories = list_directories(os.path.join(path, git_signature))
 
     if "svn" in directories:
         cmd = ["git", "svn", "rebase"]
@@ -45,28 +45,25 @@ def get_command(bare, path):
 
 def is_bare(path):
     p = os.path.basename(path)
-    return (len(p) > 4) & (p.endswith(git_sign))
+    return (len(p) > 4) & (p.endswith(git_signature))
     pass
 
 
-def update_repos(repo_list):
+def update_repositories(repository_list):
     """
     Update repository list
     """
 
     repo_count = 0
 
-    for repo in repo_list:
-        bare, path = repo
-        cmd = get_command(bare, path)
+    for repository in repository_list:
+        cmd, path = repository
         # print repo_count,"]==> ", repo, "cmd=> ", cmd
-        pool.spawn(update_repo, repo, cmd, repo_count)
+        pool.spawn(update_repository, path, cmd, repo_count)
         repo_count += 1
 
 
-def update_repo(repo, cmd, count):
-    bare, path = repo
-
+def update_repository(path, cmd, count):
     os.chdir(path)
     print count, "]", "updating:", path
     p = Popen(' '.join(cmd), cwd=path, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
@@ -75,37 +72,37 @@ def update_repo(repo, cmd, count):
             print count, "]", path, ":", line,
 
 
-def find_repos(path):
+def find_repositories(path):
     """
     Find list of potential repositories in current and child folders
     """
 
-    repolist = []
-    global repo_count
+    repository_list = []
     os.chdir(path)
     directories = list_directories(path)
 
     # is this a standard git/git-svn repo?
-    if git_sign in directories:
-        repolist.append((False, path))
-        return repolist
+    if git_signature in directories:
+        cmd = get_command(False, path)
+        repository_list.append((cmd, path))
+        return repository_list
 
-    # find git bare repos
+    # find git bare repositories
     for d in directories:
         p = os.path.join(path, d)
         bare = is_bare(d)
         if bare:
-            repolist.append((bare, p))
+            cmd = get_command(bare, p)
+            repository_list.append((cmd, p))
         else:
-            repolist.extend(find_repos(p))
+            repository_list.extend(find_repositories(p))
 
-    return repolist
+    return repository_list
 
 if __name__ == "__main__":
     cwd = os.getcwd()
-    repos = find_repos(cwd)
-    update_repos(repos)
+    repositories = sorted(find_repositories(cwd), key=lambda tup: tup[1])
+    update_repositories(repositories)
     os.chdir(cwd)
-
-    # pool.join()
-    print "Processed ", len(repos), " repositories"
+    pool.join()
+    print "Processed ", len(repositories), " repositories"
